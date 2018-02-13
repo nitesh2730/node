@@ -16,10 +16,8 @@ router.post("/sendBooks",function(req,res){
     // console.log("this is the post", data.startdate);
     function ui(start,end)
     {
-    //var url = 'mongodb://handoffdb:btgyavbScrDfeXMfnrdRJwsdiKhb0Nj72oeuio0Hrfzghyz0WOgHoUG1v2hSvdUzIetMmqa8Du3ljrugl8nDWg==@handoffdb.documents.azure.com:10255/?ssl=true';
-    //
-    //var url ='mongodb://handoffdb:btgyavbScrDfeXMfnrdRJwsdiKhb0Nj72oeuio0Hrfzghyz0WOgHoUG1v2hSvdUzIetMmqa8Du3ljrugl8nDWg==@handoffdb.documents.azure.com:10255/?ssl=true';'
-    var url = 'mongodb://handoffdb:btgyavbScrDfeXMfnrdRJwsdiKhb0Nj72oeuio0Hrfzghyz0WOgHoUG1v2hSvdUzIetMmqa8Du3ljrugl8nDWg==@handoffdb.documents.azure.com:10255/?ssl=true';
+    
+    var url = 'mongodbURL';
     var fileload;
     
     //no need for the current date
