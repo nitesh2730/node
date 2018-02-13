@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ChatBot</title>
+    <link rel="stylesheet" type="text/css" href="./stylesheets/styletest.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+    <script src="./func.js"></script>
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('myController',
+            function ($scope, $http) {
+    
+                var request = {
+                    method: 'get',
+                    url: 'users/getBook',
+                    dataType: 'json',
+                    headers:{'Content-Type': 'application/x-www-form-urlencoded'}
+                   
+                };
+                $http(request)
+                    .success(function (jsonData) {
+                        $scope.myData = jsonData;
+                    })
+                    .error(function () {
+                      console.log("Error here");
+    
+                    });
+    
+    
+    
+    
+                $scope.selected=[];
+    
+                $scope.exist=function(item){
+                    return $scope.selected.indexOf(item) > -1;
+    
+                }
+                $scope.toggleSelection=function(item){
+                    var idx = $scope.selected.indexOf(item);
+                    if(idx > -1){
+                        $scope.selected.splice(idx,1);
+                    }
+                    else{
+                        $scope.selected.push(item);
+                    }
+                }
+    
+            });
+    
+        </script>
+      
+
+</head>
+<body>
+
+    <div class="limiter" ng-app="myApp" ng-controller="myController">
+        <div class="container-table100">
+                <div class="wrap-table100" style="float:left">
+					<!-- search bar implementation 
+                    <div class="search" style="margin-bottom:13px">
+                    <input id="search51" name="q" type="text" size="40" placeholder="Search..." ng-model="searchtxt" />
+                    </div>
+					search bar implementation ends here -->
+					
+					<!-- startdate and end date implementation -->
+					<div class="searchstartdate" style="margin-bottom:13px">
+                    <input id="search51startdate" name="q" type="text" size="40" placeholder="Start Date..."  />
+                    </div>
+					<div class="searchenddate" style="margin-bottom:13px">
+                    <input id="search51enddate" name="q" type="text" size="40" placeholder="End Date..."  />
+                    </div>
+					<button  id ="startendbtn" class="btn" style="margin-top:10px" >
+                          <span class="text" onclick="startendbtn();">Submit</span>
+                    </button>
+					<!-- satrt and ends ends here  -->
+
+                    <div class="table100" >
+                        <table>
+                            <thead>
+                                <tr class="table100-head">
+                                    <th class="column1">IntentName</th>
+                                    <th class="column2">Text</th>
+                                    <th class="column3">EntityLabel</th>
+                                    <th class="column4">Add to LUIS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    <tr ng-repeat="data in myData | filter: searchtxt | orderBy : 'intentName'  "  >
+                                        <td class="column1">{{data.intentName}}</td>
+                                        <td class="column2">{{data.text}}</td>
+                                        <td class="column3">{{data.entityLabels}}</td>
+                                        <td class="column4"><input type="checkbox" name="" ng-model="selected" ng-checked="exist(data)" ng-click="toggleSelection(data)"></td>
+                                    </tr>
+                            </tbody>
+                        </table>
+                        <button class="btn" style="margin-top:10px">
+                          <span class="text">Validate</span>
+                        </button>
+                        <button class="btn" style="margin-top:10px">
+                          <span class="text">Submit</span>
+                        </button>
+
+                    </div>
+                </div>
+
+                <!--<div id="selectedcontent" style="float:right">
+                    <h3 style="text-align:center; ">Added Contents</h3>
+                    <p ng-repeat="selecteditems in selected" style="text-align:center; ">IntentName: {{selecteditems.intentName}} || Text: {{selecteditems.text}} || EntityLabel: {{selecteditems.entityLabels}}</p>
+                </div> -->
+        </div>
+    </div>
+
+</body>
+
+</html>
