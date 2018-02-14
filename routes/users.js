@@ -1,8 +1,10 @@
 var express = require('express');
-var data = require('../public/func');
+// var data = require('../public/func');
 var router = express.Router();
 var MongoClient = require('mongodb').MongoClient;
 var fs = require('fs');
+var rslt=null;
+var x=[];
 
 
 /* GET users listing. */
@@ -12,136 +14,101 @@ router.get('/getBook',function(req,res){
 
 })
 router.post("/sendBooks",function(req,res){
-    //var req=JSON.parse(req.body)
-    // console.log("this is the post", data.startdate);
-    function ui(start,end)
-    {
-    
-    var url = 'mongodbURL';
-    var fileload;
-    
-    //no need for the current date
-    /*
-    var datetime = (new Date()).toISOString();
-    console.log("system date");
-    console.log(datetime);
-    
-    */
-    //console.log(datetime.toISOString());
-    
-    
+    var sdate=String(req.body.startdate);
+    var edate=String(req.body.enddate);
+    // sdate="'"+sdate+"'";
+    // edate="'"+edate+"'";
+    console.log(sdate,edate);
+    // var sdate="2017-12-12T10:31:47.31Z";
+    // var edate="2017-12-30T10:31:47.31Z";
+        var fileload;
+     var url='';
+    console.log("outside mongo connect");
+  
     MongoClient.connect(url, function(err, db) {
-    if (err) throw err;
-    
-    
-    //manually give the dates here!
-    var sdate=start;//='2017-12-11 00:00:00';   // enter the start date
-    var edate=end;//='2017-12-13 00:00:00';   // end date --if not given then take the current date
-    //edate=datetime;         
-    var anotherobj;
-    var myobj;
-    var newobj;
-    var x="";
-    ///when you want to fetch the date that is present in cosmos db
-    
-    //db.collection("file").findOne({}, function(err, result) {
-     /*   if (err) throw err;
-        //console.log(result.name);
-        anotherobj =  result;
-        console.log(anotherobj);
-       // sdate='2017-12-12 00:00:00';
-       sdate=result.startDate;
-     console.log("starting date is:");
-      console.log(sdate);
-      */
-      db.collection("results").find({DateAdded:{$gte:sdate, $lt:edate}},{_id: false,DateAdded:false}).toArray(function(err, result) {
-        //db.collection("results").find({},{_id: false,DateAdded:false}).toArray(function(err, result) {
+        if (err){
+            console.log("error inside MongoClient if: ",err);
+            throw err;
+        }
+            
+        // var sdate=start;//='2017-12-11 00:00:00';
+        // var edate=end;//='2017-12-13 00:00:00';    
+        // console.log(db);   
+        const myAwesomeDB = db.db('admin');  
+        var anotherobj;
+        var myobj;
+        var newobj;
+        // var x="";
+        console.log("inside mongo connect");
+        // console.log(sdate,edate);
+        /*
+        const myAwesomeDB = db.db('handoffdb')
+        myAwesomeDB.collection("results").findOne({}, function(err, result) {
+            if (err){
+                console.log(err);
+                throw err;
+            } 
+        console.log(result);
+        db.close();
+        });
+        */
+        // console.log(db);
+        
+      
+       /* myAwesomeDB.collection("results").find({text : "computer black screen"}).toArray(function(err, result) {
+            if (err) throw err;
+            console.log(result);
+            rslt=result;
+            db.close();
+          });*/
+          var count=0;
+        //   {DateAdded:{$gte:"2017-12-9", $lt:"2017-12-30"}},{_id: false,DateAdded:false}
+        myAwesomeDB.collection("results").find({DateAdded:{$gte:sdate, $lt:edate}},{_id: false,DateAdded:false}).toArray(function(err, results) {
+            console.log("inside query");
             if (err) 
                 throw err;
-            l=result.length;  // we want to fetch the last file from the colletions
-            //console.log(result[l-1]);
-        
-            //var y = JSON.stringify(result[l-1].conversations);
-            // y = JSON.stringify(result[l-1].conversations);
-          //  x=""
-            for(i=0;i<l;i++)
-            {
-           y = JSON.stringify(result[i].conversations);
-            x=x+y;
-          //  console.log(y);
+                // console.log(results);
+            l=results.length;  // we want to fetch the last file from the colletions
+              console.log("length of results",l);
+            for(i=0;i<l;i++){
+                ln=(results[i].conversations.length);
+                count=count+ln;
+                console.log("length of results.conversations",ln);
+                for(j=0;j<ln;j++){
+                    x.push(results[i].conversations[j]);
+                    console.log("-------------------------------------------------------")
+                    console.log(results[i].conversations[j]);
+                    console.log("-------------------------------------------------------")
+                }
+                // y = results[i].conversations;
+                // console.log('----------------------------------------------datad----------')
+                // console.log(JSON.parse(y));
+                // console.log('----------------------------------------------datad----------')
             }
-            console.log(x);   ///this contains all the content of fetched files combined that is needed to be stored
+            // console.log(x);   ///this contains all the content of fetched files combined that is needed to be stored
             console.log("NO. of records fetched= %d",l);
-        
-        
-            //no need to update the cosmos db now,
-        /*
-           // var h="2017-12-12T10:31:47.31Z";
-           var h="2017-12-12";
-            var g="";
-            var dateobj = {startDate:h,endDate:g};
-         //   console.log("new updated date");
-           // console.log(dateobj)
-            db.collection("file").updateOne(anotherobj,dateobj,function(err,res){
-                if (err) throw err
-                 console.log('Document date Updated');
-             
-               });   
-    
-            */
-                 
-               /*////this code will run only once when we need to create a collection in db
-                 db.collection("ui").insertOne(myobj, function(err, res) {
-                   if (err) throw err;
-                   console.log("1 document inserted");
-                 
-                 });
-                 */
-                //no need to insert a new date now
-                /*
-                newobj = {me:x};
-                db.collection("ui").insertOne(newobj, function(err, res) {
-                    if (err) throw err;
-                    console.log("1 document inserted");
-                  
-                  });
-                  */
-    /*
-     
-                 db.collection("ui").findOne({}, function(err, result) {
-                 if (err) throw err;
-                   oldobj =  result;
-                   console.log("fetched data");
-                   console.log(oldobj);
-    
-    
-                   ///got the objrct and now we want to update with new value
-    
-                   console.log("NEW VALUE=");
-                   console.log(newobj);
-                   db.collection("ui").updateMany(oldobj,newobj,function(err,res){
-                    if (err) throw err
-                     console.log('Document Updated with new values');
-                 
-                   });  
-                 });  
-    
-               */
-                  
-                    db.close();
-                   
-            
+            // res.json(x);
+            console.log("-------------------------------------------------end");
+            console.log(typeof(x));
+            console.log(x);
+            console.log(x.length);
+            console.log(count);
+            res.json(x);
+            db.close();
         });
-    //});
-    //console.log("starting date is1111:");
-    //console.log(sdate);
-    
-    
+        
     });
-    
-    }
-})
 
+//,4000);
+ /*   if(rslt){
+        console.log(rslt);
+    }
+    else{
+        console.log("---------");
+    }
+    */  
+    
+})
 
 //useful link   https://www.w3schools.com/jsref/jsref_toisostring.asp
 module.exports = router;
